@@ -1,1 +1,1 @@
-# The-Phantom-Syllabus-Curator
+# The github activity bot
