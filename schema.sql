@@ -1,0 +1,15 @@
+CREATE TABLE Repositories (
+    RepositoryID INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(255) NOT NULL,
+    Path NVARCHAR(500) NOT NULL UNIQUE
+);
+
+CREATE TABLE Commits (
+    CommitID INT IDENTITY(1,1) PRIMARY KEY,
+    CommitHash NVARCHAR(50) NOT NULL UNIQUE,
+    Message NVARCHAR(MAX) NOT NULL,
+    Author NVARCHAR(100) NOT NULL,
+    CommitDate DATETIME NOT NULL,
+    Category NVARCHAR(50) DEFAULT 'Other',
+    RepositoryID INT FOREIGN KEY REFERENCES Repositories(RepositoryID)
+);
