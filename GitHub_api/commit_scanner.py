@@ -4,7 +4,7 @@ import os
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from database.db_connection import get_db_connection
+from database.connection.py import get_connection.py
 
 def fetch_repositories(username, token):
     """Fetches all repositories for the given user from GitHub."""
@@ -41,7 +41,7 @@ def fetch_commits(username, repo_name, token):
 
 def save_to_database(repo_data, commits_data):
     """Saves the repository and its commits into the SQL database."""
-    conn = get_db_connection()
+    conn = get_connection.py()
     cursor = conn.cursor()
 
     try:

@@ -1,6 +1,6 @@
 import pyodbc
 
-def get_db_connection():
+def get_connection.py():
     """
     Establishes and returns a connection to the SQL Server database.
     """
