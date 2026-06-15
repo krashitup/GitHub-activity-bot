@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Activity Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <main class="page">
+        <section class="panel">
+            <h1>GitHub Activity Dashboard</h1>
+            <p class="intro">Scan GitHub repositories and save commit activity in SQL Server.</p>
+
+            <form action="/scan" method="post" class="scan-form">
+                <label for="username">GitHub Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter username" required>
+
+                <label for="token">Personal Access Token</label>
+                <input type="password" id="token" name="token" placeholder="Enter PAT" required>
+
+                <button type="submit">Scan GitHub Activity</button>
+            </form>
+
+            <a class="report-link" href="/report">View saved report</a>
+        </section>
+    </main>
+</body>
+</html>

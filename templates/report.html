@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Report</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <main class="page">
+        <section class="panel wide-panel">
+            <h1>Activity Report</h1>
+
+            <div class="summary-grid">
+                <div class="summary-box">
+                    <span class="summary-number">{{ report_data.total_repositories }}</span>
+                    <span class="summary-label">Total Repositories</span>
+                </div>
+
+                <div class="summary-box">
+                    <span class="summary-number">{{ report_data.total_commits }}</span>
+                    <span class="summary-label">Total Commits</span>
+                </div>
+            </div>
+
+            <h2>Commit Categories</h2>
+
+            {% if report_data.categories %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Commits</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in report_data.categories %}
+                            <tr>
+                                <td>{{ category.name }}</td>
+                                <td>{{ category.count }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="empty-message">No commits found yet. Run a scan first.</p>
+            {% endif %}
+
+            <h2>Simple Activity Summary</h2>
+            <p class="intro">
+                Your database currently stores {{ report_data.total_commits }} commits
+                from {{ report_data.total_repositories }} repositories.
+            </p>
+
+            <div class="actions">
+                <a class="button-link" href="/">Scan again</a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

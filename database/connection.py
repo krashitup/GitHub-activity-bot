@@ -1,16 +1,13 @@
 import pyodbc
 
-def get_connection.py():
-    """
-    Establishes and returns a connection to the SQL Server database.
-    """
-    connection_string = (
-        "Driver={ODBC Driver 17 for SQL Server};"
-        'localhost\SQLEXPRESS'
-        "Database=GitActivityDB;"
-        "Trusted_Connection=yes;"
+def get_db_connection():
+    conn = pyodbc.connect(
+        'Driver={ODBC Driver 18 for SQL Server};'
+        'Server=localhost\\SQLEXPRESS;'
+        'Database=GitActivityDB;'
+        'Trusted_Connection=yes;'
+        'Encrypt=no;'
+        'TrustServerCertificate=yes;',
+        timeout=5
     )
-    
-    connection = pyodbc.connect(connection_string)
-    
-    return connection
+    return conn

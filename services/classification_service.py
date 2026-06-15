@@ -17,18 +17,3 @@ def classify_commit(message):
     else:
         return 'Other'
 
-# Temporary test block
-if __name__ == "__main__":
-   
-    test_messages = [
-        "feat: added user authentication",
-        "Fixing the broken login button",
-        "Updated the README file",
-        "Refactoring the database connection",
-        "Initial commit"
-    ]
-    
-    print("--- Testing Commit Classification ---")
-    for msg in test_messages:
-        category = classify_commit(msg)
-        print(f"Message: '{msg}' -> Category: [{category}]")
