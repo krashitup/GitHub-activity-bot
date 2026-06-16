@@ -23,6 +23,50 @@
                 </div>
             </div>
 
+            <!-- Feature 6: Search Commit Messages -->
+            <div class="search-box" style="margin: 20px 0; padding: 15px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 4px;">
+                <form action="/search" method="get" style="display: flex; gap: 10px;">
+                    <input type="text" name="q" placeholder="Search commit messages..." required style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    <button type="submit" style="padding: 10px 20px; background: #0366d6; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Search</button>
+                </form>
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+                <!-- Feature 1: Repository List -->
+                <div style="flex: 1; min-width: 300px;">
+                    <h2>Repository List</h2>
+                    {% if report_data.repositories %}
+                        <ul style="list-style-type: none; padding: 0;">
+                        {% for repo in report_data.repositories %}
+                            <li style="margin-bottom: 10px; padding: 10px; background: #f1f8ff; border: 1px solid #c8e1ff; border-radius: 4px;">
+                                <a href="/repository/{{ repo.id }}" style="text-decoration: none; color: #0366d6; font-weight: bold;">{{ repo.name }}</a>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="empty-message">No repositories found.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Feature 7: Recent Activity -->
+                <div style="flex: 1; min-width: 300px;">
+                    <h2>Recent Activity</h2>
+                    {% if report_data.recent_commits %}
+                        <ul style="list-style-type: none; padding: 0;">
+                        {% for commit in report_data.recent_commits %}
+                            <li style="margin-bottom: 10px; padding: 10px; border-bottom: 1px solid #ddd;">
+                                <span style="font-weight: bold; display: block; color: #586069; font-size: 0.9em;">{{ commit.date }}</span>
+                                <span>{{ commit.message }}</span>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="empty-message">No recent activity.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Feature 8: Category Breakdown -->
             <h2>Commit Categories</h2>
 
             {% if report_data.categories %}

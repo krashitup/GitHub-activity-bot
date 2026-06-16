@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repository Commits</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <main class="page">
+        <section class="panel wide-panel">
+            <h1>Repository: {{ repo_data.repo_name }}</h1>
+
+            <div class="actions" style="margin-bottom: 20px;">
+                <a class="button-link" href="/report">Back to Report</a>
+            </div>
+
+            <h2>Commits</h2>
+
+            {% if repo_data.commits %}
+                <ul style="list-style-type: none; padding: 0;">
+                {% for commit in repo_data.commits %}
+                    <li style="margin-bottom: 10px; padding: 15px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 4px;">
+                        <span style="font-weight: bold; color: #586069; display: block; margin-bottom: 5px;">{{ commit.date }}</span>
+                        <span style="font-size: 1.1em;">{{ commit.message }}</span>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p class="empty-message">No commits found for this repository.</p>
+            {% endif %}
+
+        </section>
+    </main>
+</body>
+</html>

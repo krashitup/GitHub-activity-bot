@@ -1,6 +1,6 @@
 # GitHub Activity Dashboard
 
-GitHub Activity Dashboard is a beginner-friendly Python project that scans GitHub repositories, saves commit data in Microsoft SQL Server, classifies commits, and displays simple activity reports.
+GitHub Activity Dashboard is a Python project that scans GitHub repositories, saves commit data in Microsoft SQL Server(SSMS), classifies commits, and displays simple activity reports.
 
 The project first supports a terminal menu, then adds a simple Flask web interface using only basic routes, HTML, and CSS.
 
