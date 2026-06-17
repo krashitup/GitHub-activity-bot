@@ -39,7 +39,7 @@ def fetch_commits(username, repo_name, token):
     return []
 
 
-def save_to_database(repo_data, commits_data):
+def save_to_database(username, repo_data, commits_data):
     """Saves one repository and its commits into SQL Server."""
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -48,15 +48,15 @@ def save_to_database(repo_data, commits_data):
         repo_name = repo_data["name"]
         repo_url = repo_data["html_url"]
 
-        cursor.execute("SELECT RepositoryID FROM Repositories WHERE Path = ?", repo_url)
+        cursor.execute("SELECT RepositoryID FROM Repositories WHERE RepositoryPath = ? AND Username = ?", (repo_url, username))
         result = cursor.fetchone()
 
         if result:
             repo_id = result[0]
         else:
             cursor.execute(
-                "INSERT INTO Repositories (Name, Path) OUTPUT INSERTED.RepositoryID VALUES (?, ?)",
-                (repo_name, repo_url)
+                "INSERT INTO Repositories (Username, RepositoryName, RepositoryPath) OUTPUT INSERTED.RepositoryID VALUES (?, ?, ?)",
+                (username, repo_name, repo_url)
             )
             repo_id = cursor.fetchone()[0]
 
@@ -74,7 +74,7 @@ def save_to_database(repo_data, commits_data):
             if not cursor.fetchone():
                 cursor.execute(
                     """INSERT INTO Commits
-                       (CommitHash, Message, Author, CommitDate, RepositoryID, Category)
+                       (CommitHash, CommitMessage, AuthorName, CommitDate, RepositoryID, CommitCategory)
                        VALUES (?, ?, ?, ?, ?, ?)""",
                     (commit_hash, message, author, commit_date, repo_id, category)
                 )
@@ -99,6 +99,6 @@ def run_scanner(username, token):
         commits = fetch_commits(username, repo["name"], token)
 
         if commits:
-            save_to_database(repo, commits)
+            save_to_database(username, repo, commits)
 
     print("\nScanning and Database Sync Complete!")

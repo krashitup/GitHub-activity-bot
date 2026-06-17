@@ -1,6 +1,6 @@
 import sys
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session, redirect, url_for
 
 from GitHub_api.commit_scanner import run_scanner
 from services.report_services import (
@@ -12,6 +12,7 @@ from services.report_services import (
 
 
 app = Flask(__name__)
+app.secret_key = "github_activity_secret_key"
 
 
 def show_home_page():
@@ -28,26 +29,47 @@ def scan_github_activity():
     token = request.form.get("token")
 
     if username and token:
+        session["username"] = username
         run_scanner(username, token)
 
-    report_data = get_activity_report_data()
-    return render_template("report.html", report_data=report_data)
+    current_user = session.get("username")
+    if not current_user:
+        return redirect(url_for("show_home_page"))
+
+    return redirect(url_for("show_report_page"))
 
 
 def show_report_page():
     """Shows saved GitHub activity data in the browser."""
-    report_data = get_activity_report_data()
+    username = session.get("username")
+    if not username:
+        return redirect(url_for("show_home_page"))
+
+    report_data = get_activity_report_data(username)
     return render_template("report.html", report_data=report_data)
+
 
 def show_repository_page(repo_id):
     """Shows commits for a specific repository."""
-    repo_data = get_repository_commits(repo_id)
+    username = session.get("username")
+    if not username:
+        return redirect(url_for("show_home_page"))
+
+    repo_data = get_repository_commits(repo_id, username)
+    if not repo_data:
+        return "Unauthorized or Repository Not Found", 403
+
     return render_template("repo_commits.html", repo_data=repo_data)
+
 
 def search_activity():
     """Searches for commits matching a query."""
+    username = session.get("username")
+    if not username:
+        return redirect(url_for("show_home_page"))
+
     query = request.args.get('q', '')
-    results = search_commits(query) if query else []
+    results = search_commits(query, username) if query else []
     return render_template("search.html", query=query, results=results)
 
 
@@ -67,7 +89,8 @@ def run_cli_menu():
             run_scanner(username, token)
 
         elif choice == "2":
-            generate_activity_report()
+            username = input("Enter GitHub username for report: ")
+            generate_activity_report(username)
 
         elif choice == "3":
             print("Goodbye!")

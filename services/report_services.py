@@ -1,21 +1,30 @@
 from database.connection import get_db_connection
 
 
-def get_activity_report_data():
+def get_activity_report_data(username):
     """Returns report data from SQL Server so CLI and Flask can both use it."""
     conn = get_db_connection()
     cursor = conn.cursor()
 
     try:
-        cursor.execute("SELECT COUNT(*) FROM Repositories")
+        cursor.execute("SELECT COUNT(*) FROM Repositories WHERE Username = ?", (username,))
         total_repositories = cursor.fetchone()[0]
 
-        cursor.execute("SELECT COUNT(*) FROM Commits")
+        cursor.execute("""
+            SELECT COUNT(*) FROM Commits c
+            JOIN Repositories r ON c.RepositoryID = r.RepositoryID
+            WHERE r.Username = ?
+        """, (username,))
         total_commits = cursor.fetchone()[0]
 
-        cursor.execute(
-            "SELECT Category, COUNT(*) FROM Commits GROUP BY Category ORDER BY COUNT(*) DESC"
-        )
+        cursor.execute("""
+            SELECT c.CommitCategory, COUNT(*) 
+            FROM Commits c
+            JOIN Repositories r ON c.RepositoryID = r.RepositoryID
+            WHERE r.Username = ?
+            GROUP BY c.CommitCategory 
+            ORDER BY COUNT(*) DESC
+        """, (username,))
         category_rows = cursor.fetchall()
 
         categories = []
@@ -26,7 +35,7 @@ def get_activity_report_data():
             })
 
         # Feature 1: Repository List
-        cursor.execute("SELECT RepositoryID, Name FROM Repositories ORDER BY Name")
+        cursor.execute("SELECT RepositoryID, RepositoryName FROM Repositories WHERE Username = ? ORDER BY RepositoryName", (username,))
         repositories = []
         for row in cursor.fetchall():
             repositories.append({
@@ -35,7 +44,13 @@ def get_activity_report_data():
             })
 
         # Feature 7: Recent Activity
-        cursor.execute("SELECT TOP 5 Message, CommitDate FROM Commits ORDER BY CommitDate DESC")
+        cursor.execute("""
+            SELECT TOP 5 c.CommitMessage, c.CommitDate 
+            FROM Commits c
+            JOIN Repositories r ON c.RepositoryID = r.RepositoryID
+            WHERE r.Username = ?
+            ORDER BY c.CommitDate DESC
+        """, (username,))
         recent_commits = []
         for row in cursor.fetchall():
             recent_commits.append({
@@ -54,16 +69,21 @@ def get_activity_report_data():
     finally:
         conn.close()
 
-def get_repository_commits(repo_id):
+
+def get_repository_commits(repo_id, username):
     """Feature 2: Fetch all commits for a specific repository."""
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
-        cursor.execute("SELECT Name FROM Repositories WHERE RepositoryID = ?", (repo_id,))
+        cursor.execute("SELECT RepositoryName FROM Repositories WHERE RepositoryID = ? AND Username = ?", (repo_id, username))
         repo_row = cursor.fetchone()
-        repo_name = repo_row[0] if repo_row else "Unknown Repository"
+        
+        if not repo_row:
+            return None
+            
+        repo_name = repo_row[0]
 
-        cursor.execute("SELECT Message, CommitDate FROM Commits WHERE RepositoryID = ? ORDER BY CommitDate DESC", (repo_id,))
+        cursor.execute("SELECT CommitMessage, CommitDate FROM Commits WHERE RepositoryID = ? ORDER BY CommitDate DESC", (repo_id,))
         commits = []
         for row in cursor.fetchall():
             commits.append({
@@ -78,13 +98,20 @@ def get_repository_commits(repo_id):
     finally:
         conn.close()
 
-def search_commits(query):
+
+def search_commits(query, username):
     """Feature 6: Search commit messages."""
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
         search_term = f"%{query}%"
-        cursor.execute("SELECT Message, CommitDate FROM Commits WHERE Message LIKE ? ORDER BY CommitDate DESC", (search_term,))
+        cursor.execute("""
+            SELECT c.CommitMessage, c.CommitDate 
+            FROM Commits c
+            JOIN Repositories r ON c.RepositoryID = r.RepositoryID
+            WHERE c.CommitMessage LIKE ? AND r.Username = ?
+            ORDER BY c.CommitDate DESC
+        """, (search_term, username))
         results = []
         for row in cursor.fetchall():
             results.append({
@@ -96,10 +123,10 @@ def search_commits(query):
         conn.close()
 
 
-def generate_activity_report():
+def generate_activity_report(username):
     """Prints a simple report in the terminal."""
     try:
-        report_data = get_activity_report_data()
+        report_data = get_activity_report_data(username)
 
         print("\n" + "=" * 50)
         print("GIT ACTIVITY DASHBOARD REPORT")
